@@ -24,11 +24,7 @@ public class EventSummary {
         long totalFeedback = feedbackList.size();
 
         if (totalFeedback == 0) {
-            return EventSummary.builder()
-                    .totalFeedback(0)
-                    .sentimentCounts(Collections.emptyMap())
-                    .sentimentPercentages(Collections.emptyMap())
-                    .build();
+            return new EventSummary(0L, Collections.emptyMap(), Collections.emptyMap());
         }
 
         Map<String, Long> sentimentCounts = feedbackList.stream()
@@ -43,10 +39,6 @@ public class EventSummary {
                         entry -> (double) entry.getValue() / totalFeedback
                 ));
 
-        return EventSummary.builder()
-                .totalFeedback(totalFeedback)
-                .sentimentCounts(sentimentCounts)
-                .sentimentPercentages(sentimentPercentages)
-                .build();
+        return new EventSummary(totalFeedback, sentimentCounts, sentimentPercentages);
     }
 }

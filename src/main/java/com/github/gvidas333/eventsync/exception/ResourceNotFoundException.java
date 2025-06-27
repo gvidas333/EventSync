@@ -1,4 +1,4 @@
-package exception;
+package com.github.gvidas333.eventsync.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -6,7 +6,7 @@ import com.github.gvidas333.eventsync.model.Feedback;
 import com.github.gvidas333.eventsync.model.Sentiment;
 import com.github.gvidas333.eventsync.repository.EventRepository;
 import com.github.gvidas333.eventsync.repository.FeedbackRepository;
-import exception.ResourceNotFoundException;
+import com.github.gvidas333.eventsync.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
