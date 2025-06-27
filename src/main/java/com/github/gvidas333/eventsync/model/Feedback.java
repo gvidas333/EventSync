@@ -16,7 +16,8 @@ public class Feedback {
 
     private String text;
 
-    private String sentiment;
+    @Enumerated(EnumType.STRING)
+    private Sentiment sentiment;
 
     private LocalDateTime timestamp;
 
