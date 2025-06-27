@@ -1,4 +1,11 @@
 package com.github.gvidas333.eventsync.repository;
 
-public interface EventRepository {
+import com.github.gvidas333.eventsync.model.Event;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.UUID;
+
+@Repository
+public interface EventRepository extends JpaRepository<Event, UUID> {
 }
