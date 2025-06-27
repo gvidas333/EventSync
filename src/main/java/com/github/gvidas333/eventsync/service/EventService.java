@@ -1,5 +1,6 @@
 package com.github.gvidas333.eventsync.service;
 
+import com.github.gvidas333.eventsync.dto.EventSummary;
 import com.github.gvidas333.eventsync.model.Event;
 import com.github.gvidas333.eventsync.model.Feedback;
 import com.github.gvidas333.eventsync.model.Sentiment;
@@ -43,5 +44,15 @@ public class EventService {
                 .build();
 
         return feedbackRepository.save(newFeedback);
+    }
+
+    public EventSummary getEventSummary(UUID eventId) {
+        if (!eventRepository.existsById(eventId)) {
+            throw new ResourceNotFoundException("Event not found with id: " + eventId);
+        }
+
+        List<Feedback> feedbackList = feedbackRepository.findByEventId(eventId);
+
+        return EventSummary.from(feedbackList);
     }
 }
