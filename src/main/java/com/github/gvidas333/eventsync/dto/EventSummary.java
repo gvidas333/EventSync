@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventSummary {
-    private long totalCount;
+    private long totalFeedback;
     private Map<String, Long> sentimentCounts;
     private Map<String, Double> sentimentPercentages;
 
@@ -25,7 +24,11 @@ public class EventSummary {
         long totalFeedback = feedbackList.size();
 
         if (totalFeedback == 0) {
-            return new EventSummary(0L, Collections.emptyMap(), Collections.emptyMap());
+            return EventSummary.builder()
+                    .totalFeedback(0)
+                    .sentimentCounts(Collections.emptyMap())
+                    .sentimentPercentages(Collections.emptyMap())
+                    .build();
         }
 
         Map<String, Long> sentimentCounts = feedbackList.stream()
@@ -40,6 +43,10 @@ public class EventSummary {
                         entry -> (double) entry.getValue() / totalFeedback
                 ));
 
-        return new EventSummary(totalFeedback, sentimentCounts, sentimentPercentages);
+        return EventSummary.builder()
+                .totalFeedback(totalFeedback)
+                .sentimentCounts(sentimentCounts)
+                .sentimentPercentages(sentimentPercentages)
+                .build();
     }
 }
