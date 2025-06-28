@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EventSync</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+            padding: 0 20px;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #005A9C;
+            padding-bottom: 8px;
+            margin-bottom: 25px;
+        }
+
+        .event-card {
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 500px;
+        }
+
+        input, textarea {
+            padding: 12px;
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #005A9C;
+            box-shadow: 0 0 0 3px rgba(0, 90, 156, 0.1);
+        }
+
+        button {
+            background-color: #005A9C;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #004375;
+        }
+
+        .summary {
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #005A9C;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #e1e4e8;
+            margin: 32px 0;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <h1>EventSync</h1>
+
+    <section>
+        <h2>Create a New Event</h2>
+        <form id="create-event-form">
+            <input type="text" id="event-title" placeholder="Event Title" required>
+            <textarea id="event-description" placeholder="Event Description"></textarea>
+            <button type="submit">Create Event</button>
+        </form>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>All Events</h2>
+        <div id="event-list">
+        </div>
+    </section>
+
+    <script>
+        const eventListContainer = document.getElementById('event-list');
+        const createEventForm = document.getElementById('create-event-form');
+
+        async function fetchAndDisplayEvents() {
+            try {
+                const response = await fetch('/events');
+                const events = await response.json();
+
+                eventListContainer.innerHTML = '';
+
+                events.forEach(event => {
+                    const eventCard = document.createElement('article');
+                    eventCard.className = 'event-card';
+
+                    eventCard.innerHTML = `
+                    <h3>${event.title}</h3>
+                    <p>${event.description}</p>
+                    <div class="summary" id="summary-${event.id}">Loading summary...</div>
+                    <hr>
+                    <form class="feedback-form" id="feedback-form-${event.id}" data-event-id="${event.id}">
+                        <textarea name="feedback" placeholder="Your feedback..." required></textarea>
+                        <button type="submit">Submit Feedback</button>
+                    </form>
+                `;
+                    eventListContainer.appendChild(eventCard);
+
+                    fetchAndDisplaySummary(event.id);
+                });
+            } catch (error) {
+                console.error('Failed to fetch events', error);
+            }
+        }
+
+        async function fetchAndDisplaySummary(eventId) {
+            const summaryContainer = document.getElementById('summary-' + eventId);
+            try {
+                const response = await fetch(`/events/${eventId}/summary`);
+                if(!response.ok) throw new Error(`An error occurred: ${response.statusText}`);
+                const summary = await response.json();
+
+                summaryContainer.innerHTML = `
+                    <strong>Total Feedback:</strong> ${summary.totalFeedback} |
+                    <strong>Counts:</strong>
+                    <span title="Positive">Positive: ${summary.sentimentCounts.POSITIVE || 0}</span>,
+                    <span title="Neutral">Neutral: ${summary.sentimentCounts.NEUTRAL || 0}</span>,
+                    <span title="Negative">Negative: ${summary.sentimentCounts.NEGATIVE || 0}</span>
+                `
+            } catch (error) {
+                console.error(`Error fetching summary for event ${eventId}:`, error);
+                summaryContainer.innerHTML = `<div class="summary" style="color: red;">Could not load summary.</div>`;
+            }
+        }
+
+        createEventForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('event-title').value;
+            const description = document.getElementById('event-description').value;
+
+            await fetch('/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description })
+            });
+
+            createEventForm.reset();
+            fetchAndDisplayEvents();
+        });
+
+        eventListContainer.addEventListener('submit', async (e) => {
+            if (e.target.classList.contains('feedback-form')) {
+                e.preventDefault();
+
+                const eventId = e.target.dataset.eventId;
+                const feedbackText = e.target.querySelector('textarea[name="feedback"]').value;
+
+                if (!feedbackText.trim()) {
+                    alert('Please provide a feedback text.');
+                    return;
+                }
+
+                try {
+                    const requestBody = { text: feedbackText };
+                    const response = await fetch(`/events/${eventId}/feedback`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to submit feedback.');
+                    }
+
+                    e.target.reset();
+                    fetchAndDisplaySummary(eventId);
+                } catch (error) {
+                    console.error('Error submitting feedback', error);
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', fetchAndDisplayEvents);
+    </script>
+
+</body>
+</html>
