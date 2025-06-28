@@ -1,6 +1,8 @@
 package com.github.gvidas333.eventsync.service;
 
+import com.github.gvidas333.eventsync.dto.CreateEventRequest;
 import com.github.gvidas333.eventsync.dto.EventSummary;
+import com.github.gvidas333.eventsync.mapper.EventMapper;
 import com.github.gvidas333.eventsync.model.Event;
 import com.github.gvidas333.eventsync.model.Feedback;
 import com.github.gvidas333.eventsync.model.Sentiment;
@@ -22,8 +24,10 @@ public class EventService {
     private final FeedbackRepository feedbackRepository;
     private final SentimentAnalysisService sentimentAnalysisService;
 
-    public Event createEvent(Event event) {
-        return eventRepository.save(event);
+    public Event createEvent(CreateEventRequest createEventRequest) {
+        Event newEvent = EventMapper.toEntity(createEventRequest);
+
+        return eventRepository.save(newEvent);
     }
 
     public List<Event> getAllEvents() {
