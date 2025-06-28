@@ -49,7 +49,6 @@ The application requires a Hugging Face API key to function.
 
 ```properties
 huggingface.api.key=YOUR_HUGGING_FACE_API_KEY
-huggingface.api.url=[https://api-inference.huggingface.co/models/cardiffnlp/twitter-roberta-base-sentiment](https://api-inference.huggingface.co/models/cardiffnlp/twitter-roberta-base-sentiment)
 ```
 
 **3. Build and Run the Application**
@@ -62,3 +61,10 @@ You can run the application directly using the Maven wrapper included in the pro
 ```
 
 The application will start up and be accessible at `http://localhost:8080`.
+
+## API Documentation and Usage
+
+This project includes Swagger UI for interactive API documentation. Once the application is running, you can access it at:
+
+**[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)**
+
