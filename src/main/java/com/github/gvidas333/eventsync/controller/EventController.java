@@ -8,6 +8,7 @@ import com.github.gvidas333.eventsync.model.Feedback;
 import com.github.gvidas333.eventsync.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class EventController {
     @Operation(summary = "Create a new event")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Event createEvent(@RequestBody CreateEventRequest createEventRequest) {
+    public Event createEvent(@RequestBody @Valid CreateEventRequest createEventRequest) {
         return eventService.createEvent(createEventRequest);
     }
 
@@ -38,7 +39,7 @@ public class EventController {
 
     @Operation(summary = "Submit feedback for an event")
     @PostMapping("/{eventId}/feedback")
-    public Feedback submitFeedback(@PathVariable UUID eventId, @RequestBody CreateFeedbackRequest createFeedbackRequest) {
+    public Feedback submitFeedback(@PathVariable UUID eventId, @RequestBody @Valid CreateFeedbackRequest createFeedbackRequest) {
         return eventService.submitFeedback(eventId, createFeedbackRequest.getText());
     }
 
