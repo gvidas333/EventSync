@@ -41,9 +41,11 @@ public class SentimentAnalysisService {
         if (scoresNode != null && scoresNode.isArray()) {
             for (JsonNode scoreNode : scoresNode) {
                 double score = scoreNode.get("score").asDouble();
+                String label = scoreNode.get("label").asText();
+
                 if (score > maxScore) {
                     maxScore = score;
-                    topLabel = scoreNode.get("label").asText();
+                    topLabel = label;
                 }
             }
         }
@@ -54,7 +56,7 @@ public class SentimentAnalysisService {
         return switch (label) {
             case "LABEL_2" -> Sentiment.POSITIVE;
             case "LABEL_0" -> Sentiment.NEGATIVE;
-            default -> Sentiment.NEGATIVE;
+            default -> Sentiment.NEUTRAL;
         };
     }
 }

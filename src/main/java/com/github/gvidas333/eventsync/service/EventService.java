@@ -24,8 +24,8 @@ public class EventService {
     private final FeedbackRepository feedbackRepository;
     private final SentimentAnalysisService sentimentAnalysisService;
 
-    public Event createEvent(CreateEventRequest createEventRequest) {
-        Event newEvent = EventMapper.toEntity(createEventRequest);
+    public Event createEvent(CreateEventRequest createEventRequestDto) {
+        Event newEvent = EventMapper.toEntity(createEventRequestDto);
 
         return eventRepository.save(newEvent);
     }
